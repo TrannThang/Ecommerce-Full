@@ -14,7 +14,13 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getProduct = asyncHandler(async (req, res) => {
   const { pid } = req.params;
-  const product = await Product.findById(pid);
+  const product = await Product.findById(pid).populate({
+    path: "rating",
+    populate: {
+      path: "postedBy",
+      select: "firstName lastName avatar",
+    },
+  });
   return res.status(200).json({
     success: product ? true : false,
     productData: product ? product : "Cannot get Product",
@@ -35,11 +41,24 @@ const getProducts = asyncHandler(async (req, res) => {
     (matchedEl) => `$${matchedEl}`
   );
   const formatedQueries = JSON.parse(queryString);
+  let colorQueryObject = {};
 
   //Filtering
   if (queries?.title)
     formatedQueries.title = { $regex: queries.title, $options: "i" };
-  let queryCommand = Product.find(formatedQueries);
+  if (queries?.category)
+    formatedQueries.category = { $regex: queries.category, $options: "i" };
+  if (queries?.color) {
+    delete formatedQueries.color;
+    const colorArr = queries.color?.split(",");
+    const colorQuery = colorArr.map((el) => ({
+      color: { $regex: el, $options: "i" },
+    }));
+    colorQueryObject = { $or: colorQuery };
+  }
+  const q = { ...colorQueryObject, ...formatedQueries };
+
+  let queryCommand = Product.find(q);
 
   // Sorting
   if (req.query.sort) {
@@ -66,7 +85,7 @@ const getProducts = asyncHandler(async (req, res) => {
   // Số lượng thỏa mãn điều kiện khác với số lượng sp trả về 1 lần gọi api
   queryCommand.exec(async (err, response) => {
     if (err) throw new Error(err.message);
-    const counts = await Product.find(formatedQueries).countDocuments();
+    const counts = await Product.find(q).countDocuments();
     return res.status(200).json({
       success: response ? true : false,
       counts,
@@ -98,7 +117,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 const ratings = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { star, comment, pid } = req.body;
+  const { star, comment, pid, updatedAt } = req.body;
   if (!star || !pid) throw new Error("Missing inputs");
   const ratingProduct = await Product.findById(pid);
   const alreadyRating = ratingProduct?.rating?.find(
@@ -116,6 +135,7 @@ const ratings = asyncHandler(async (req, res) => {
         $set: {
           "rating.$.star": star,
           "rating.$.comment": comment,
+          "rating.$.updatedAt": updatedAt,
         },
       }
     );
@@ -125,7 +145,7 @@ const ratings = asyncHandler(async (req, res) => {
       pid,
       {
         $push: {
-          rating: { star, comment, postedBy: _id },
+          rating: { star, comment, postedBy: _id, updatedAt },
         },
       },
       { new: true }

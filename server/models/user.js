@@ -18,10 +18,13 @@ var userSchema = new mongoose.Schema(
       required: true,
       unique: true, // k dc trùng
     },
+    avatar: {
+      type: String,
+    },
     mobile: {
       type: String,
-      required: true,
       unique: true,
+      require: true,
     },
     password: {
       type: String,
@@ -62,6 +65,9 @@ var userSchema = new mongoose.Schema(
       type: String,
     },
     passwordResetExpires: {
+      type: String,
+    },
+    registerToken: {
       type: String,
     },
   },
