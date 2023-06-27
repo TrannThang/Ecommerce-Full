@@ -32,7 +32,8 @@ var userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "user",
+      enum: [1998, 1999],
+      default: 1999,
     },
     cart: [
       {

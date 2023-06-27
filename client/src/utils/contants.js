@@ -182,3 +182,68 @@ export const voteOptions = [
     text: "Perfect",
   },
 ];
+
+const { RiDashboardFill, MdGroups2, MdProductionQuantityLimits, RiBillLine } =
+  icons;
+
+export const adminSideBar = [
+  {
+    id: 1,
+    type: "SINGLE",
+    text: "Dashboard",
+    path: `/${path.ADMIN}/${path.DASHBOARD}`,
+    icon: <RiDashboardFill size={20} />,
+  },
+  {
+    id: 2,
+    type: "SINGLE",
+    text: "Manage User",
+    path: `/${path.ADMIN}/${path.MANAGE_USER}`,
+    icon: <MdGroups2 size={20} />,
+  },
+  {
+    id: 3,
+    type: "PARENT",
+    text: "Manage Products",
+    icon: <MdProductionQuantityLimits size={20} />,
+    submenu: [
+      {
+        text: "Create product",
+        path: `/${path.ADMIN}/${path.CREATE_PRODUCTS}`,
+      },
+      {
+        text: "Manage products",
+        path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+      },
+    ],
+  },
+  {
+    id: 4,
+    type: "SINGLE",
+    text: "Manage orders",
+    path: `/${path.ADMIN}/${path.MANAGE_ORDER}`,
+    icon: <RiBillLine size={20} />,
+  },
+];
+
+export const roles = [
+  {
+    code: 1998,
+    value: "Admin",
+  },
+  {
+    code: 1999,
+    value: "User",
+  },
+];
+
+export const blockStatus = [
+  {
+    code: true,
+    value: "Blocked",
+  },
+  {
+    code: false,
+    value: "Active",
+  },
+];

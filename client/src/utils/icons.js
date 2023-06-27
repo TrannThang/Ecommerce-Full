@@ -1,5 +1,10 @@
-import { RiPhoneFill, RiTruckFill } from "react-icons/ri";
-import { MdEmail } from "react-icons/md";
+import {
+  RiPhoneFill,
+  RiTruckFill,
+  RiDashboardFill,
+  RiBillLine,
+} from "react-icons/ri";
+import { MdEmail, MdGroups2, MdProductionQuantityLimits } from "react-icons/md";
 import {
   BsHandbagFill,
   BsFillSuitHeartFill,
@@ -25,11 +30,15 @@ const icons = {
   FaTty,
   AiOutlineDown,
   MdEmail,
+  RiDashboardFill,
   BsHandbagFill,
   FaUserCircle,
+  MdProductionQuantityLimits,
   AiFillHome,
   AiFillStar,
   AiFillGift,
+  RiBillLine,
+  MdGroups2,
   BsFillReplyAllFill,
   AiOutlineStar,
   BsShieldShaded,

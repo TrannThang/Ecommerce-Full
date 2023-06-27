@@ -17,6 +17,9 @@ export const userSlice = createSlice({
     },
     logout: (state, action) => {
       state.isLoggedIn = false;
+      state.current = null;
+      state.isLoading = false;
+      state.mes = "";
       state.token = null;
     },
     clearMessage: (state) => {
@@ -44,7 +47,7 @@ export const userSlice = createSlice({
       state.current = null;
       state.isLoggedIn = false;
       state.token = null;
-      state.mes = "Phiên đăng nhập đã hết hạn.Hãy đăng nhập lại nhé";
+      state.mes = "Login session has expired.Please login again";
     });
   },
 });

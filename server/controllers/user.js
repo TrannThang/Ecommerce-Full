@@ -9,6 +9,8 @@ const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const crypto = require("crypto");
 const makeToken = require("uniqid");
+const { users } = require("../utils/constant");
+const { log } = require("console");
 
 // const register = asyncHandler(async (req, res) => {
 //   const { email, password, firstName, lastName } = req.body;
@@ -136,9 +138,7 @@ const login = asyncHandler(async (req, res) => {
 const getCurrent = asyncHandler(async (req, res) => {
   const { _id } = req.user;
 
-  const user = await User.findById(_id).select(
-    " -refreshToken -password -role"
-  );
+  const user = await User.findById(_id).select(" -refreshToken -password ");
   return res.status(200).json({
     success: user ? true : false,
     rs: user ? user : "User not found",
@@ -237,20 +237,78 @@ const resetPassWord = asyncHandler(async (req, res) => {
 });
 
 const getUsers = asyncHandler(async (req, res) => {
-  const response = await User.find().select(" -refreshToken -password -role");
-  return res.status(200).json({
-    success: response ? true : false,
-    users: response,
+  const queries = { ...req.query };
+  // Tách các trường dac biệt ra khỏi query
+  const excludeFields = ["limit", "sort", "page", "fields"];
+  excludeFields.forEach((el) => delete queries[el]);
+
+  //Format lại các operators cho đúng cú pháp của mongoose
+  let queryString = JSON.stringify(queries);
+  queryString = queryString.replace(
+    /\b(gte|gt|lt|lte)\b/g,
+    (matchedEl) => `$${matchedEl}`
+  );
+  const formatedQueries = JSON.parse(queryString);
+
+  //Filtering
+  if (queries?.name)
+    formatedQueries.name = { $regex: queries.name, $options: "i" };
+
+  if (req.query.q) {
+    delete formatedQueries.q;
+    formatedQueries["$or"] = [
+      { firstName: { $regex: req.query.q, $options: "i" } },
+      { lastName: { $regex: req.query.q, $options: "i" } },
+
+      {
+        email: { $regex: req.query.q, $options: "i" },
+      },
+    ];
+  }
+
+  let queryCommand = User.find(formatedQueries);
+
+  // Sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    queryCommand = queryCommand.sort(sortBy);
+  }
+  // Fields limiting
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join("");
+    queryCommand = queryCommand.select(fields);
+  }
+
+  //Pagination
+  //limit:số object lấy về mỗi lần gọi API
+  // skip: 2
+  // document : 1 2 3 ...10
+  // +dffdd=>NaN
+  const page = +req.query.page || 1;
+  const limit = req.query.limit || process.env.LIMIT_PRODUCTS;
+  const skip = (page - 1) * limit;
+  queryCommand.skip(skip).limit(limit);
+
+  // Excecute query
+  // Số lượng thỏa mãn điều kiện khác với số lượng sp trả về 1 lần gọi api
+  queryCommand.exec(async (err, response) => {
+    if (err) throw new Error(err.message);
+    const counts = await User.find(formatedQueries).countDocuments();
+    return res.status(200).json({
+      success: response ? true : false,
+      counts,
+      users: response ? response : "Cannot get Product",
+    });
   });
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
-  const { _id } = req.query;
-  if (!_id) throw new Error("Missing Input");
-  const response = await User.findByIdAndDelete(_id);
+  const { uid } = req.params;
+
+  const response = await User.findByIdAndDelete(uid);
   return res.status(200).json({
     success: response ? true : false,
-    deletedUser: response
+    mes: response
       ? `User with email ${response.email} deleted`
       : "No user delete",
   });
@@ -276,7 +334,7 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
   }).select("-password -role -refreshToken");
   return res.status(200).json({
     success: response ? true : false,
-    updatedUser: response ? response : "Something went wrong",
+    mes: response ? "Updated" : "Something went wrong",
   });
 });
 
@@ -361,8 +419,17 @@ const updateCart = asyncHandler(async (req, res) => {
   }
 });
 
+const createUsers = asyncHandler(async (req, res) => {
+  const response = await User.create(users);
+  return res.status(200).json({
+    success: response ? true : false,
+    users: response ? response : "Something went wrong",
+  });
+});
+
 module.exports = {
   register,
+  createUsers,
   login,
   getCurrent,
   refreshAccessToken,

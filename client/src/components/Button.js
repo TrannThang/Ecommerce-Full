@@ -7,10 +7,11 @@ const Button = ({
   iconsBefore,
   iconAfter,
   fw,
+  type = "button",
 }) => {
   return (
     <button
-      type="button"
+      type={type}
       className={
         style
           ? style

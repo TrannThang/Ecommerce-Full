@@ -1,5 +1,5 @@
 export { default as Header } from "./Header";
-export { default as Sidebar } from "./Sidebar";
+export { default as Sidebar } from "./Sidebar/Sidebar";
 export { default as Banner } from "./Banner";
 export { default as Navigation } from "./Navigation";
 export { default as BestSeller } from "./BestSeller";
@@ -27,3 +27,7 @@ export { default as Modal } from "./Modal";
 export { default as Comments } from "./Comments";
 export { default as Pagination } from "./Pagination";
 export { default as PagiItem } from "./PagiItem";
+export { default as Loading } from "./Loading";
+export { default as AdminSideBar } from "./Sidebar/AdminSideBar";
+export { default as InputForm } from "./InputForm";
+export { default as Select } from "./Select";
