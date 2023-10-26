@@ -27,7 +27,9 @@ const Select = ({
       >
         <option value="">------CHOOSE------</option>
         {options?.map((el) => (
-          <option value={el.code}>{el.value}</option>
+          <option key={el.value} value={el.code}>
+            {el.value}
+          </option>
         ))}
       </select>
       {errors[id] && (

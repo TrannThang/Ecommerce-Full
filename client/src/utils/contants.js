@@ -186,6 +186,37 @@ export const voteOptions = [
 const { RiDashboardFill, MdGroups2, MdProductionQuantityLimits, RiBillLine } =
   icons;
 
+export const memberSideBar = [
+  {
+    id: 1,
+    type: "SINGLE",
+    text: "Personal",
+    path: `/${path.MEMBER}/${path.PERSONAL}`,
+    icon: <RiDashboardFill size={20} />,
+  },
+  {
+    id: 2,
+    type: "SINGLE",
+    text: "My Cart",
+    path: `/${path.MEMBER}/${path.MY_CART}`,
+    icon: <MdGroups2 size={20} />,
+  },
+  {
+    id: 3,
+    type: "SINGLE",
+    text: "Buy History",
+    path: `/${path.MEMBER}/${path.HISTORY}`,
+    icon: <RiBillLine size={20} />,
+  },
+  {
+    id: 4,
+    type: "SINGLE",
+    text: "Wishlist",
+    path: `/${path.MEMBER}/${path.WISHLIST}`,
+    icon: <RiBillLine size={20} />,
+  },
+];
+
 export const adminSideBar = [
   {
     id: 1,
