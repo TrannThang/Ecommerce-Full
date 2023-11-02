@@ -45,7 +45,7 @@ const getProducts = asyncHandler(async (req, res) => {
 
   //Format lại các operators cho đúng cú pháp của mongoose
   let queryString = JSON.stringify(queries);
-  queryString = queryString.replace(
+  queryString = queryString?.replace(
     /\b(gte|gt|lt|lte)\b/g,
     (matchedEl) => `$${matchedEl}`
   );

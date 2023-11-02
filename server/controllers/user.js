@@ -138,7 +138,15 @@ const login = asyncHandler(async (req, res) => {
 const getCurrent = asyncHandler(async (req, res) => {
   const { _id } = req.user;
 
-  const user = await User.findById(_id).select(" -refreshToken -password ");
+  const user = await User.findById(_id)
+    .select(" -refreshToken -password ")
+    .populate({
+      path: "cart",
+      populate: {
+        path: "product",
+        select: "title thumb price",
+      },
+    });
   return res.status(200).json({
     success: user ? true : false,
     rs: user ? user : "User not found",
@@ -244,7 +252,7 @@ const getUsers = asyncHandler(async (req, res) => {
 
   //Format lại các operators cho đúng cú pháp của mongoose
   let queryString = JSON.stringify(queries);
-  queryString = queryString.replace(
+  queryString = queryString?.replace(
     /\b(gte|gt|lt|lte)\b/g,
     (matchedEl) => `$${matchedEl}`
   );
@@ -359,12 +367,13 @@ const updateUserAddress = asyncHandler(async (req, res) => {
 
 const updateCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { pid, quantity, color } = req.body;
+  const { pid, quantity = 1, color, price, thumbnail, title } = req.body;
   if (!pid || !quantity || !color) throw new Error("Missing Input");
   const user = await User.findById(_id).select("cart");
   const alreadyProduct = user?.cart?.find(
-    (el) => el.product.toString() === pid
+    (el) => el.product.toString() === pid && el.color === color
   );
+  console.log(alreadyProduct);
   if (alreadyProduct) {
     if (alreadyProduct.color === color) {
       const response = await User.updateOne(
@@ -376,6 +385,9 @@ const updateCart = asyncHandler(async (req, res) => {
         {
           $set: {
             "cart.$.quantity": quantity,
+            "cart.$.price": price,
+            "cart.$.thumbnail": thumbnail,
+            "cart.$.title": title,
           },
         },
         {
@@ -384,22 +396,8 @@ const updateCart = asyncHandler(async (req, res) => {
       );
       return res.status(200).json({
         success: response ? true : false,
-        updatedUser: response ? response : "Something went wrong",
+        updatedUser: response ? "Updated your cart" : "Something went wrong",
       });
-    } else {
-      const response = await User.findByIdAndUpdate(
-        _id,
-        {
-          $push: {
-            cart: {
-              product: pid,
-              quantity,
-              color,
-            },
-          },
-        },
-        { new: true }
-      );
     }
   } else {
     const response = await User.findByIdAndUpdate(
@@ -410,6 +408,9 @@ const updateCart = asyncHandler(async (req, res) => {
             product: pid,
             quantity,
             color,
+            price,
+            thumbnail,
+            title,
           },
         },
       },
@@ -417,9 +418,38 @@ const updateCart = asyncHandler(async (req, res) => {
     );
     return res.status(200).json({
       success: response ? true : false,
-      updatedUser: response ? response : "Something went wrong",
+      updatedUser: response ? "Updated your cart" : "Something went wrong",
     });
   }
+});
+
+const removeProductInCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const { pid, color } = req.params;
+  const user = await User.findById(_id).select("cart");
+  const alreadyProduct = user?.cart?.find(
+    (el) => el?.product?.toString() === pid && el.color === color
+  );
+  if (!alreadyProduct)
+    return res.status(200).json({
+      success: true,
+      mes: "Updated your cart",
+    });
+  const response = await User.findByIdAndUpdate(
+    _id,
+    {
+      $pull: {
+        cart: {
+          product: pid,
+        },
+      },
+    },
+    { new: true }
+  );
+  return res.status(200).json({
+    success: response ? true : false,
+    updatedUser: response ? "Updated your cart" : "Something went wrong",
+  });
 });
 
 const createUsers = asyncHandler(async (req, res) => {
@@ -446,4 +476,5 @@ module.exports = {
   updateUserAddress,
   updateCart,
   finalRegister,
+  removeProductInCart,
 };
