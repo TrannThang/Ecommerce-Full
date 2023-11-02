@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import logo from "../assets/logo.png";
 import icons from "../utils/icons";
 import { Link } from "react-router-dom";
@@ -7,12 +7,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { Fragment } from "react";
 import { logout } from "store/user/userSlice";
 import { useEffect } from "react";
+import withBaseComponent from "hocs/withBaseComponent";
+import { showCart } from "store/app/appSlice";
 
 const { RiPhoneFill, MdEmail, FaUserCircle, BsHandbagFill } = icons;
-const Header = () => {
+const Header = ({ dispatch }) => {
   const { current } = useSelector((state) => state.user);
   const [isShowOption, setIsShowOption] = useState(false);
-  const dispatch = useDispatch();
+
   useEffect(() => {
     const handleClickoutOptions = (e) => {
       const profile = document.getElementById("profile");
@@ -45,9 +47,12 @@ const Header = () => {
         </div>
         {current && (
           <Fragment>
-            <div className=" cursor-pointer flex items-center px-6 border-r justify-center gap-2">
+            <div
+              onClick={() => dispatch(showCart())}
+              className=" cursor-pointer flex items-center px-6 border-r justify-center gap-2"
+            >
               <BsHandbagFill color="red" />
-              <span>0 item</span>
+              <span>{`${current?.cart?.length || 0} item(s)`}</span>
             </div>
             <div
               onClick={() => setIsShowOption((prev) => !prev)}
@@ -91,4 +96,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default withBaseComponent(memo(Header));

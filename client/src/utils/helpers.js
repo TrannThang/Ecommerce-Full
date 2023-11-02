@@ -10,7 +10,7 @@ export const createSlug = (string) =>
     .split(" ")
     .join("-");
 
-export const removeNumber = (string) => string.replace(/[0-9]/g, "");
+export const removeNumber = (string) => string?.replace(/[0-9]/g, "");
 
 export const formatMoney = (number) =>
   Number(number?.toFixed(1)).toLocaleString();

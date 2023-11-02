@@ -34,3 +34,6 @@ export { default as InputForm } from "./InputForm";
 export { default as Select } from "./Select";
 export { default as MarkdownEditor } from "./MarkdownEditor";
 export { default as CustomizeVatiants } from "./CustomizeVatiants";
+export { default as QuickView } from "./QuickView";
+export { default as Cart } from "./Cart";
+export { default as OrderItem } from "./OrderItem";

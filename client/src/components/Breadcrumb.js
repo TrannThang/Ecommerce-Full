@@ -2,10 +2,11 @@ import React from "react";
 import useBreadcrumbs from "use-react-router-breadcrumbs";
 import { Link } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
+import { removeNumber } from "utils/helpers";
 
 const Breadcrumb = ({ title, category }) => {
   const routes = [
-    { path: "/:category", breadcrumb: category },
+    { path: "/:category", breadcrumb: removeNumber(category) },
     { path: "/", breadcrumb: "Home" },
     { path: "/:category/:pid/:title", breadcrumb: title },
   ];

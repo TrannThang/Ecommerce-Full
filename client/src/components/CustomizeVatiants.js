@@ -57,7 +57,6 @@ const CustomizeVatiants = ({
         setPreview({ thumb: "", images: [] });
       } else toast.error(response.mes);
     }
-    console.log(data);
   };
   const handlePreviewThumb = async (file) => {
     const base64Thumb = await getBase64(file);
