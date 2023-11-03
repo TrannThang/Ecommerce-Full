@@ -41,7 +41,7 @@ const DetailCart = ({ location }) => {
         ))}
       </div>
       <div className="w-main mx-auto flex flex-col mb-12 justify-center items-end gap-3">
-        <span className="flex items-center gap-8">
+        <span className="flex items-center gap-8 text-sm">
           <span>Subtotal:</span>
           <span className="text-main font-bold">{`${formatMoney(
             currentCart?.reduce(

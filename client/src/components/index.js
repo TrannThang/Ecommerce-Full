@@ -37,3 +37,4 @@ export { default as CustomizeVatiants } from "./CustomizeVatiants";
 export { default as QuickView } from "./QuickView";
 export { default as Cart } from "./Cart";
 export { default as OrderItem } from "./OrderItem";
+export { default as Paypal } from "./Paypal";

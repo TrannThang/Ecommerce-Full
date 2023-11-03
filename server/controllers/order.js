@@ -5,39 +5,14 @@ const asyncHandler = require("express-async-handler");
 
 const createOrder = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const { coupon } = req.body;
-  const userCart = await User.findById(_id)
-    .select("cart")
-    .populate("cart.product", "title price");
-  const products = userCart?.cart?.map((el) => ({
-    product: el.product.id,
-    count: el.quantity,
-    color: el.color,
-  }));
-  let total = userCart?.cart?.reduce(
-    (sum, el) => el.product.price * el.quantity + sum,
-    0
-  );
-  const createData = {
-    products,
-    total,
-    orderBy: _id,
-  };
-  if (coupon) {
-    const selectedCoupon = await Coupon.findById(coupon);
-    total =
-      Math.round((total * (1 - +selectedCoupon?.discount / 100)) / 1000) *
-        1000 || total;
-    createData.total = total;
-    createData.coupon = coupon;
+  const { products, total, address } = req.body;
+  if (address) {
+    await User.findByIdAndUpdate(_id, { address });
   }
-
-  const rs = await Order.create(createData);
-
+  const rs = await Order.create({ products, total, postedBy: _id });
   return res.json({
     success: rs ? true : false,
     rs: rs ? rs : "Something went wrong ",
-    userCart,
   });
 });
 
